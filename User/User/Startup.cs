@@ -28,6 +28,11 @@ namespace User
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddHttpClient<DCIClientService>(c =>
+            {
+                c.BaseAddress = new Uri("https://api.discover.com/dci/");
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             services.AddSingleton<ItemLineService>();
             services.AddHttpClient();
         }
