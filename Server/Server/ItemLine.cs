@@ -19,5 +19,6 @@ namespace Server
         public decimal Tip { get; set; }
         public string MerchantCountry { get; set; }
         public string MerchantCurrency { get; set; }
+        public decimal MerchantExchangeRate { get; set; }
     }
 }

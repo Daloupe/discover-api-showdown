@@ -19,6 +19,7 @@ namespace Merchant
         public decimal Tip { get; set; }
         public string MerchantCountry { get; set; }
         public string MerchantCurrency { get; set; }
+        public decimal MerchantExchangeRate{ get; set; }
 
         public static ItemLine From(Item item)
         {
