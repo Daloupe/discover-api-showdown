@@ -1,0 +1,85 @@
+﻿@page "/createbill"
+
+@using Merchant.Data
+@inject ItemService ItemService
+
+<h1>Create Bill</h1>
+
+Bill Id <input style="display: inline; width: 200px;" readonly value=@billId />
+
+@if (items == null)
+{
+    <p><em>Loading Items</em></p>
+}
+else
+{
+    <div class="grid-container-2">
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="item-name">Name</th>
+                        <th class="item-price">Price</th>
+                        <th class="action-button">Add</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td class="item-price">@item.Price</td>
+                            <td class="action-button" @onclick="@(() => AddItem(item))">+</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="item-name">Name</th>
+                        <th class="item-price">Price</th>
+                        <th class="action-button">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var itemLine in itemLines)
+                    {
+                        <tr>
+                            <td class="item-name">@itemLine.Name</td>
+                            <td class="item-price">@itemLine.Price</td>
+                            <td class="action-button" @onclick="@(() => RemoveItemLine(itemLine))">-</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    Item[] items;
+    List<ItemLine> itemLines;
+    Guid billId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        billId = Guid.NewGuid();
+        itemLines = new List<ItemLine>();
+        items = await ItemService.GetItems();
+    }
+
+    protected void AddItem(Item item)
+    {
+        itemLines.Add(ItemLine.From(billId, item));
+        StateHasChanged();
+    }
+
+    protected void RemoveItemLine(ItemLine itemLine)
+    {
+        itemLines.Remove(itemLine);
+        StateHasChanged();
+    }
+}

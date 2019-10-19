@@ -111,6 +111,24 @@ app {
     color: red;
 }
 
+.grid-container-2 {
+    display: grid;
+    grid-template-columns: auto auto
+}
+
+.item-name {
+    width: 200px;
+}
+
+.item-price {
+    width: 100px;
+}
+
+.action-button {
+    text-align: center;
+    width: 40px;
+}
+
 @media (max-width: 767.98px) {
     .main .top-row {
         display: none;
