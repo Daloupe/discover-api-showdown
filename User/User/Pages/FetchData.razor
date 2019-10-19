@@ -2,13 +2,13 @@
 
 @using User.Data
 @using User.Models
+@using System.Threading;
 @inject DCIClientService DCIClientService
 @inject ItemLineService ItemLineService
 User Id
 <input style="display: inline; width: 200px;" readonly value=@userId />
-
-User Id <input style="display: inline; width: 200px;" readonly value=@userId />
-Bill Id <input style="display: inline; width: 200px;" @bind=@billId />
+Bill Id
+<input style="display: inline; width: 200px;" @bind=@billId />
 <button @onclick="GetBill">Get Bill</button>
 
 @if (itemLines == null)
@@ -51,18 +51,18 @@ else
                 <tbody>
                     @foreach (var itemLine in itemLines.Where(x => x.IsClaimed))
                     {
-                    <tr>
-                        <td class="item-name">@itemLine.Name</td>
-                        <td class="item-price">@itemLine.Price</td>
-                        @if (itemLine.ClaimerId == userId)
-                        {
-                            <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
-                        }
-                        else
-                        {
-                            <td class="action-button"></td>
-                        }
-                    </tr>
+                        <tr>
+                            <td class="item-name">@itemLine.Name</td>
+                            <td class="item-price">@itemLine.Price</td>
+                            @if (itemLine.ClaimerId == userId)
+                            {
+                                <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
+                            }
+                            else
+                            {
+                                <td class="action-button"></td>
+                            }
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -76,6 +76,7 @@ else
     string billId { get; set; }
     ItemLine[] itemLines;
     Currencies currencies;
+    Timer timer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,8 +87,11 @@ else
 
     protected async Task GetBill()
     {
-        itemLines = await ItemLineService.GetItemLines(Guid.Parse(billId));
-        StateHasChanged();
+        if (!string.IsNullOrWhiteSpace(billId))
+        {
+            itemLines = await ItemLineService.GetItemLines(Guid.Parse(billId));
+            StateHasChanged();
+        }
     }
 
     protected async Task ClaimItemLine(ItemLine itemLine)
