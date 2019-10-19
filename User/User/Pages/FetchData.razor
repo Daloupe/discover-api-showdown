@@ -4,6 +4,8 @@
 @inject ItemLineService ItemLineService
 
 User Id <input style="display: inline; width: 200px;" readonly value=@userId />
+Bill Id <input style="display: inline; width: 200px;" @bind=@billId />
+<button @onclick="GetBill">Get Bill</button>
 
 @if (itemLines == null)
 {
@@ -63,21 +65,30 @@ else
 @code
 {
     Guid userId;
+    string billId { get; set; }
     ItemLine[] itemLines;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
-        itemLines = await ItemLineService.GetItemLines(Guid.Empty);
+        return Task.CompletedTask;
+    }
+
+    protected async Task GetBill()
+    {
+        itemLines = await ItemLineService.GetItemLines(Guid.Parse(billId));
+        StateHasChanged();
     }
 
     protected async Task ClaimItemLine(ItemLine itemLine)
     {
         itemLines = await ItemLineService.ClaimItemLine(userId, itemLine.ItemId);
+        StateHasChanged();
     }
 
     protected async Task UnclaimItemLine(ItemLine itemLine)
     {
         itemLines = await ItemLineService.UnclaimItemLine(itemLine.ItemId);
+        StateHasChanged();
     }
 }

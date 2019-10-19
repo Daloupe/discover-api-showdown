@@ -28,7 +28,8 @@ namespace Merchant
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<ItemService>();
+            services.AddSingleton<BillService>();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

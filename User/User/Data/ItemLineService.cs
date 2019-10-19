@@ -16,8 +16,8 @@ namespace User.Data
 
         public async Task<ItemLine[]> GetItemLines(Guid billId)
         {
-            return await _httpClientFactory
-                .CreateClient()
+            using var client = _httpClientFactory.CreateClient();
+            return await client
                 .GetStringAsync("https://localhost:5001/bill/" + billId)
                 .Deserialize<ItemLine[]>();
         }

@@ -1,11 +1,12 @@
 ﻿@page "/createbill"
 
 @using Merchant.Data
-@inject ItemService ItemService
+@inject BillService BillService
 
 <h1>Create Bill</h1>
 
-Bill Id <input style="display: inline; width: 200px;" readonly value=@billId />
+<p>Bill Id: @billId</p>
+<button @onclick="Create">Create Bill</button>
 
 @if (items == null)
 {
@@ -62,24 +63,29 @@ else
 @code {
     Item[] items;
     List<ItemLine> itemLines;
-    Guid billId;
+    Guid? billId;
 
     protected override async Task OnInitializedAsync()
     {
-        billId = Guid.NewGuid();
         itemLines = new List<ItemLine>();
-        items = await ItemService.GetItems();
+        items = await BillService.GetItems();
     }
 
     protected void AddItem(Item item)
     {
-        itemLines.Add(ItemLine.From(billId, item));
+        itemLines.Add(ItemLine.From(item));
         StateHasChanged();
     }
 
     protected void RemoveItemLine(ItemLine itemLine)
     {
         itemLines.Remove(itemLine);
+        StateHasChanged();
+    }
+
+    protected async Task Create()
+    {
+        billId = await BillService.CreateBill(itemLines);
         StateHasChanged();
     }
 }
