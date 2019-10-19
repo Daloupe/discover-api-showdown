@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace User
         private readonly string _tipApiPlan = "DCI_TIPETIQUETTE_SANDBOX";
         private readonly string _tipUrl = "tip/v1/";
 
-        private readonly string _token = "f84904c9-332e-46a6-a2dd-cdbfd9fdb371";
+        private readonly string _token = "07ebbc11-b96e-4ae5-bb33-a8fdd56678fe";
 
         public HttpClient Client { get; }
 
@@ -49,7 +50,7 @@ namespace User
             return JsonSerializer.Deserialize<TipGuide[]>(json);
         }
 
-        public async Task<Currencies> GetCurrencyConversions()
+        public async Task<Currency[]> GetCurrencyConversions()
         {
             // Usings no longer need the squiggly brackets and will dispose when they go out of scope.
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _dciUri + _converterUrl + "exchangerates");
@@ -60,7 +61,7 @@ namespace User
             var json = await response.Content.ReadAsStringAsync();
 
             // System.Text.Json now exists with its own optimized json serializers.
-            return JsonSerializer.Deserialize<Currencies>(json);
+            return JsonSerializer.Deserialize<Currencies>(json).CurrencyArray.Where(x => x.Name != "NULL").ToArray();
         }
     }
 }
