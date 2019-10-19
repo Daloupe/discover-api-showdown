@@ -42,7 +42,7 @@ else
                     {
                         <tr>
                             <td>@itemLine.Name</td>
-                            <td class="item-price">@itemLine.Price</td>
+                            <td class="item-price">@((itemLine.MerchantExchangeRate / exchangeRate) * itemLine.Price)</td>
                             <td class="action-button" @onclick="@(() => ClaimItemLine(itemLine))">+</td>
                         </tr>
                     }
@@ -63,7 +63,7 @@ else
                     {
                         <tr>
                             <td class="item-name">@itemLine.Name</td>
-                            <td class="item-price">@itemLine.Price</td>
+                            <td class="item-price">@((itemLine.MerchantExchangeRate / exchangeRate) * itemLine.Price)</td>
                             @if (itemLine.ClaimerId == userId)
                             {
                                 <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
