@@ -7,18 +7,10 @@
 User Id
 <input style="display: inline; width: 200px;" readonly value=@userId />
 
-@if (currencies == null)
-{
-    <p><em>Loading Currency</em></p>
-}
-else
-{
-    @foreach (var currency in currencies.CurrencyArray)
-    {
-        <span>@currency.Name</span>
-        <span>@currency.ExchangeRate</span>
-    }
-}
+User Id <input style="display: inline; width: 200px;" readonly value=@userId />
+Bill Id <input style="display: inline; width: 200px;" @bind=@billId />
+<button @onclick="GetBill">Get Bill</button>
+
 @if (itemLines == null)
 {
     <p><em>Loading Items</em></p>
@@ -77,6 +69,7 @@ else
 @code
 {
     Guid userId;
+    string billId { get; set; }
     ItemLine[] itemLines;
     Currencies currencies;
 
@@ -87,13 +80,21 @@ else
         itemLines = await ItemLineService.GetItemLines(Guid.Empty);
     }
 
+    protected async Task GetBill()
+    {
+        itemLines = await ItemLineService.GetItemLines(Guid.Parse(billId));
+        StateHasChanged();
+    }
+
     protected async Task ClaimItemLine(ItemLine itemLine)
     {
         itemLines = await ItemLineService.ClaimItemLine(userId, itemLine.ItemId);
+        StateHasChanged();
     }
 
     protected async Task UnclaimItemLine(ItemLine itemLine)
     {
         itemLines = await ItemLineService.UnclaimItemLine(itemLine.ItemId);
+        StateHasChanged();
     }
 }

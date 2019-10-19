@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Text.Json;
 
 namespace User.Data
 {
@@ -17,13 +16,10 @@ namespace User.Data
 
         public async Task<ItemLine[]> GetItemLines(Guid billId)
         {
-            var response = await _httpClientFactory.CreateClient().GetStringAsync("https://localhost:5001/bill/" + billId);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            };
-
-            return JsonSerializer.Deserialize<ItemLine[]>(response, options);
+            using var client = _httpClientFactory.CreateClient();
+            return await client
+                .GetStringAsync("https://localhost:5001/bill/" + billId)
+                .Deserialize<ItemLine[]>();
         }
 
         public async Task<ItemLine[]> ClaimItemLine(Guid userid, Guid itemId)

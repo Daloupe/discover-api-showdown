@@ -18,11 +18,10 @@ namespace Merchant
         public Guid PayerId { get; set; }
         public decimal Tip { get; set; }
 
-        public static ItemLine From(Guid billId, Item item)
+        public static ItemLine From(Item item)
         {
             return new ItemLine
             {
-                BillId = billId,
                 ItemId = Guid.NewGuid(),
                 Name = item.Name,
                 Price = item.Price,
