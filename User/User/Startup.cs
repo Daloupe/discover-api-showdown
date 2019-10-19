@@ -28,7 +28,11 @@ namespace User
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddHttpClient<DCIClientService>(c =>
+            {
+                c.BaseAddress = new Uri("https://api.discover.com/dci/");
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
