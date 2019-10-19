@@ -24,11 +24,11 @@ else
                     <tr>
                         <th class="item-name">Name</th>
                         <th class="item-price">Price</th>
-                        <th class="action-button">Add</th>
+                        <th class="action-button">Claim</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var itemLine in itemLines.Where(x => x.IsClaimed == ItemLine.NO))
+                    @foreach (var itemLine in itemLines.Where(x => !x.IsClaimed))
                     {
                         <tr>
                             <td>@itemLine.Name</td>
@@ -45,20 +45,24 @@ else
                     <tr>
                         <th class="item-name">Name</th>
                         <th class="item-price">Price</th>
-                        <th class="action-button">Remove</th>
+                        <th class="action-button">Unclaim</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var itemLine in itemLines.Where(x => x.IsClaimed == ItemLine.YES))
+                    @foreach (var itemLine in itemLines.Where(x => x.IsClaimed))
                     {
-                        <tr>
-                            <td class="item-name">@itemLine.Name</td>
-                            <td class="item-price">@itemLine.Price</td>
-                            @if (itemLine.ClaimerId == userId)
-                            {
-                                <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
-                            }
-                        </tr>
+                    <tr>
+                        <td class="item-name">@itemLine.Name</td>
+                        <td class="item-price">@itemLine.Price</td>
+                        @if (itemLine.ClaimerId == userId)
+                        {
+                            <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
+                        }
+                        else
+                        {
+                            <td class="action-button"></td>
+                        }
+                    </tr>
                     }
                 </tbody>
             </table>
@@ -96,7 +100,7 @@ else
 
     protected async Task UnclaimItemLine(ItemLine itemLine)
     {
-        itemLines = await ItemLineService.UnclaimItemLine(itemLine.ItemId);
+        itemLines = await ItemLineService.UnclaimItemLine(userId, itemLine.ItemId);
         StateHasChanged();
     }
 }

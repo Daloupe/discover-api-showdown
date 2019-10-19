@@ -11,10 +11,10 @@ namespace User
         public Guid ItemId { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
-        public int IsClaimed { get; set; }
-        public Guid ClaimerId { get; set; }
+        public bool IsClaimed { get; set; }
+        public Guid? ClaimerId { get; set; }
         public bool IsPaid { get; set; }
-        public Guid PayerId { get; set; }
+        public Guid? PayerId { get; set; }
         public decimal Tip { get; set; }
     }
 }
