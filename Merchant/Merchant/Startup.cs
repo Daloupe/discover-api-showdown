@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Merchant.Data;
+using User;
 
 namespace Merchant
 {
@@ -29,6 +30,13 @@ namespace Merchant
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<BillService>();
+
+            services.AddHttpClient<DCIClientService>(c =>
+            {
+                c.BaseAddress = new Uri("https://api.discover.com/dci/");
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
             services.AddHttpClient();
         }
 
