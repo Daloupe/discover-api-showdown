@@ -15,6 +15,12 @@ namespace User.Models
         [JsonPropertyName("exchange_rate")]
         public decimal ExchangeRate { get; set; }
     }
+
+    public class Currencies
+    {
+        [JsonPropertyName("currencies")]
+        public Currency[] CurrencyArray { get; set; }
+    }
 }
 
 //"currencies": [
