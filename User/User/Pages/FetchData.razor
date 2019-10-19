@@ -7,19 +7,49 @@
 @inject ItemLineService ItemLineService
 
 
-<select @onchange="@(e => UpdateCurrency(decimal.Parse(e.Value.ToString())))">
-    @foreach (var currency in currencies)
-    {
-        <option value=@currency.ExchangeRate.ToString()>@currency.Name</option>
-    }
-</select>
-<p>Exchange Rate: @exchangeRate</p>
-
+@if (currencies != null)
+{
+    <select @onchange="@(e => UpdateCurrency(decimal.Parse(e.Value.ToString())))">
+        @foreach (var currency in currencies)
+        {
+            <option value=@currency.ExchangeRate.ToString()>@currency.Name</option>
+        }
+    </select>
+    <p>Exchange Rate: @exchangeRate</p>
+}
 User Id:
-    <input style="display: inline; width: 200px;" readonly value=@userId />
+<input style="display: inline; width: 200px;" readonly value=@userId />
     Bill Id:
 <input style="display: inline; width: 200px;" @bind=@billId />
-<button @onclick="GetBill">Get Bill</button>
+<button class="btn btn-default" @onclick="GetBill">Get Bill</button>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Pay Bill
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (CurrentTipGuide != null)
+                {
+                    <p>Local Tip Etiquette: @CurrentTipGuide.TipDescription</p>
+                }
+                Tip Amount: <input type="number" style="display: inline; width: 100px;" @bind=@tipAmount />%
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="PayBill">Pay Bill</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @if (itemLines == null)
 {
@@ -34,7 +64,7 @@ else
                     <tr>
                         <th class="item-name">Name</th>
                         <th class="item-price">Price</th>
-                        <th class="action-button">Claim</th>
+                        <th class="action-button"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +72,7 @@ else
                     {
                         <tr>
                             <td>@itemLine.Name</td>
-                            <td class="item-price">@((itemLine.MerchantExchangeRate / exchangeRate) * itemLine.Price)</td>
+                            <td class="item-price">@((itemLine.MerchantExchangeRate == 0 ? 1 : itemLine.MerchantExchangeRate / exchangeRate) * itemLine.Price)</td>
                             <td class="action-button" @onclick="@(() => ClaimItemLine(itemLine))">+</td>
                         </tr>
                     }
@@ -55,24 +85,28 @@ else
                     <tr>
                         <th class="item-name">Name</th>
                         <th class="item-price">Price</th>
-                        <th class="action-button">Unclaim</th>
+                        <th class="action-button"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var itemLine in itemLines.Where(x => x.IsClaimed))
                     {
-                        <tr>
-                            <td class="item-name">@itemLine.Name</td>
-                            <td class="item-price">@((itemLine.MerchantExchangeRate / exchangeRate) * itemLine.Price)</td>
-                            @if (itemLine.ClaimerId == userId)
-                            {
-                                <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
-                            }
-                            else
-                            {
-                                <td class="action-button"></td>
-                            }
-                        </tr>
+                    <tr>
+                        <td class="item-name" style="color: @(itemLine.ClaimerId == userId ? "black" :  "grey")">@itemLine.Name</td>
+                        <td class="item-price" style="color: @(itemLine.ClaimerId == userId ? "black" :  "grey")">@((itemLine.MerchantExchangeRate == 0 ? 1 : itemLine.MerchantExchangeRate / exchangeRate) * itemLine.Price)</td>
+                        @if (itemLine.ClaimerId == userId && !itemLine.IsPaid)
+                        {
+                            <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
+                        }
+                        else if (itemLine.IsPaid)
+                        {
+                            <td class="action-button" style="color:green">@itemLine.Tip%</td>
+                        }
+                        else
+                        {
+                            <td class="action-button"></td>
+                        }
+                    </tr>
                     }
                 </tbody>
             </table>
@@ -84,17 +118,24 @@ else
 {
     Guid userId;
     string billId { get; set; }
-    decimal exchangeRate;
+    decimal exchangeRate = 1;
     ItemLine[] itemLines;
     Currency[] currencies = Array.Empty<Currency>();
-    TipGuide[] TipGuides;
+    decimal tipAmount = 0;
+    TipGuide CurrentTipGuide;
+    TipGuide[] tipGuides;
 
     protected override async Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
         currencies = await DCIClientService.GetCurrencyConversions();
-        TipGuides = await DCIClientService.GetTipGuides();
+        tipGuides = await DCIClientService.GetTipGuides();
         itemLines = await ItemLineService.GetItemLines(Guid.Empty);
+        CurrentTipGuide = tipGuides.FirstOrDefault(x => x.CountryName == (itemLines.FirstOrDefault()?.MerchantCountry ?? "United States"));
+        if (decimal.TryParse(CurrentTipGuide.DefaultTipAmount, out var defaultTip))
+        {
+            tipAmount = defaultTip;
+        }
     }
 
     protected async Task GetBill()
@@ -121,6 +162,12 @@ else
     void UpdateCurrency(decimal newExchangeRate)
     {
         exchangeRate = newExchangeRate;
+        StateHasChanged();
+    }
+
+    protected async Task PayBill()
+    {
+        itemLines = await ItemLineService.PayBill(userId, tipAmount);
         StateHasChanged();
     }
 }

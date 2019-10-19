@@ -49,5 +49,18 @@ namespace User.Data
             var response = await client.PostAsync("https://localhost:5001/bill/unclaim-item", new StringContent(json, Encoding.UTF8, "application/json"));
             return await response.Content.ReadAsStringAsync().Deserialize<ItemLine[]>();
         }
+
+        public async Task<ItemLine[]> PayBill(Guid userid, decimal tipAmount)
+        {
+            var json = JsonSerializer.Serialize(new PayBill
+            {
+                UserId = userid,
+                TipAmount = tipAmount,
+            });
+            using var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            var response = await client.PostAsync("https://localhost:5001/bill/pay-bill", new StringContent(json, Encoding.UTF8, "application/json"));
+            return await response.Content.ReadAsStringAsync().Deserialize<ItemLine[]>();
+        }
     }
 }

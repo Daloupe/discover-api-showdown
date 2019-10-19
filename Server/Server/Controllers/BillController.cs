@@ -69,5 +69,22 @@ namespace Server.Controllers
 
             return Task.FromResult(_itemLines.Values.Where(x => x.BillId == item.BillId));
         }
+
+        [HttpPost]
+        [Route("bill/pay-bill")]
+        public Task<IEnumerable<ItemLine>> PayBill(PayBill payBill)
+        {
+            var items = _itemLines.Values.Where(x => x.ClaimerId == payBill.UserId);
+            Guid? billId = null;
+            foreach (var item in items)
+            {
+                billId = item.BillId;
+                item.Tip = payBill.TipAmount;
+                item.PayerId = payBill.UserId;
+                item.IsPaid = true;
+            }
+
+            return Task.FromResult(_itemLines.Values.Where(x => x.BillId == billId));
+        }
     }
 }
