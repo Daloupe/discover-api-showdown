@@ -8,6 +8,30 @@
 <h1>Create Bill</h1>
 
 <p>Bill Id: @billId</p>
+
+@if (tipGuides == null || currencies == null)
+{
+    <p><em>Loading Items</em></p>
+}
+else
+{
+<p>Merchant currency:</p>
+<select @onchange="@(e => UpdateCurrency(decimal.Parse(e.Value.ToString())))">
+    @foreach (var currency in currencies)
+    {
+        <option value=@currency.ExchangeRate.ToString()>@currency.Name</option>
+    }
+</select>
+
+<p>Merchant country:</p>
+<select @onchange="@(e => UpdateCountry(e.Value.ToString()))">
+    @foreach (var tipGuide in tipGuides)
+    {
+        <option value=@tipGuide.CountryName.ToString()>@tipGuide.CountryName</option>
+    }
+</select>
+}
+
 <button @onclick="Create">Create Bill</button>
 
 @if (items == null)
@@ -65,9 +89,12 @@ else
 @code {
     Item[] items;
     List<ItemLine> itemLines;
-    Currencies currencies;
+    Currency[] currencies = Array.Empty<Currency>();
     TipGuide[] tipGuides;
     Guid? billId;
+
+    string merchantCountry;
+    decimal exchangeRate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,7 +118,21 @@ else
 
     protected async Task Create()
     {
+        itemLines.ForEach(x => x.MerchantCountry = merchantCountry);
+        itemLines.ForEach(x => x.MerchantExchangeRate = exchangeRate);
         billId = await BillService.CreateBill(itemLines);
+        StateHasChanged();
+    }
+
+    void UpdateCountry(string newMerchantCountry)
+    {
+        merchantCountry = newMerchantCountry;
+        StateHasChanged();
+    }
+
+    void UpdateCurrency(decimal newExchangeRate)
+    {
+        exchangeRate = newExchangeRate;
         StateHasChanged();
     }
 }

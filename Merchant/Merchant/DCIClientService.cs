@@ -49,7 +49,7 @@ namespace Merchant
             return JsonSerializer.Deserialize<TipGuide[]>(json);
         }
 
-        public async Task<Currencies> GetCurrencyConversions()
+        public async Task<Currency[]> GetCurrencyConversions()
         {
             // Usings no longer need the squiggly brackets and will dispose when they go out of scope.
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _dciUri + _converterUrl + "exchangerates");
@@ -60,7 +60,7 @@ namespace Merchant
             var json = await response.Content.ReadAsStringAsync();
 
             // System.Text.Json now exists with its own optimized json serializers.
-            return JsonSerializer.Deserialize<Currencies>(json);
+            return JsonSerializer.Deserialize<Currencies>(json).CurrencyArray;
         }
     }
 }

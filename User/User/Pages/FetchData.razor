@@ -87,13 +87,13 @@ else
     decimal exchangeRate;
     ItemLine[] itemLines;
     Currency[] currencies = Array.Empty<Currency>();
-    TipGuide[] tipGuides;
+    TipGuide[] TipGuides;
 
     protected override async Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
         currencies = await DCIClientService.GetCurrencyConversions();
-        tipGuides = await DCIClientService.GetTipGuides();
+        TipGuides = await DCIClientService.GetTipGuides();
         itemLines = await ItemLineService.GetItemLines(Guid.Empty);
     }
 
