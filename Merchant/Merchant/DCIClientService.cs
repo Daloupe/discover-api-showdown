@@ -18,7 +18,7 @@ namespace Merchant
         private readonly string _tipApiPlan = "DCI_TIPETIQUETTE_SANDBOX";
         private readonly string _tipUrl = "tip/v1/";
 
-        private readonly string _token = "07ebbc11-b96e-4ae5-bb33-a8fdd56678fe";
+        private readonly string _token = "0396768c-04e1-4248-8406-98fbc85d3445";
 
         public HttpClient Client { get; }
 
