@@ -1,7 +1,11 @@
 ﻿@page "/fetchdata"
 
 @using User.Data
+@using User.Models
+@inject DCIClientService DCIClientService
 @inject ItemLineService ItemLineService
+User Id
+<input style="display: inline; width: 200px;" readonly value=@userId />
 
 User Id <input style="display: inline; width: 200px;" readonly value=@userId />
 Bill Id <input style="display: inline; width: 200px;" @bind=@billId />
@@ -71,11 +75,13 @@ else
     Guid userId;
     string billId { get; set; }
     ItemLine[] itemLines;
+    Currencies currencies;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
-        return Task.CompletedTask;
+        currencies = await DCIClientService.GetCurrencyConversions();
+        itemLines = await ItemLineService.GetItemLines(Guid.Empty);
     }
 
     protected async Task GetBill()
