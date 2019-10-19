@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Merchant.Models;
+using System.Linq;
 
 namespace Merchant
 {
@@ -60,7 +61,7 @@ namespace Merchant
             var json = await response.Content.ReadAsStringAsync();
 
             // System.Text.Json now exists with its own optimized json serializers.
-            return JsonSerializer.Deserialize<Currencies>(json).CurrencyArray;
+            return JsonSerializer.Deserialize<Currencies>(json).CurrencyArray.Where(x => x.Name != "NULL").ToArray();
         }
     }
 }
