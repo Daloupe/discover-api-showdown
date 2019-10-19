@@ -1,6 +1,8 @@
 ﻿@page "/createbill"
 
 @using Merchant.Data
+@using Merchant.Models
+@inject DCIClientService DCIClientService
 @inject BillService BillService
 
 <h1>Create Bill</h1>
@@ -63,12 +65,16 @@ else
 @code {
     Item[] items;
     List<ItemLine> itemLines;
+    Currencies currencies;
+    TipGuide[] tipGuides;
     Guid? billId;
 
     protected override async Task OnInitializedAsync()
     {
         itemLines = new List<ItemLine>();
         items = await BillService.GetItems();
+        currencies = await DCIClientService.GetCurrencyConversions();
+        tipGuides = await DCIClientService.GetTipGuides();
     }
 
     protected void AddItem(Item item)

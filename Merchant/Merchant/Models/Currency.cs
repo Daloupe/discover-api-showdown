@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace User.Models
+namespace Merchant.Models
 {
     public class Currency
     {

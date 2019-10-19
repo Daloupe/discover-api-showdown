@@ -76,13 +76,13 @@ else
     string billId { get; set; }
     ItemLine[] itemLines;
     Currencies currencies;
-    TipGuide[] TipGuides;
+    TipGuide[] tipGuides;
 
     protected override async Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
         currencies = await DCIClientService.GetCurrencyConversions();
-        TipGuides = await DCIClientService.GetTipGuides();
+        tipGuides = await DCIClientService.GetTipGuides();
         itemLines = await ItemLineService.GetItemLines(Guid.Empty);
     }
 
