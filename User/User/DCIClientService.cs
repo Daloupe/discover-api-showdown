@@ -18,7 +18,7 @@ namespace User
         private readonly string _tipApiPlan = "DCI_TIPETIQUETTE_SANDBOX";
         private readonly string _tipUrl = "tip/v1/";
 
-        private readonly string _converterToken = "b4a52794-66c2-4f02-addc-0cbe45317d20";
+        private readonly string _token = "f84904c9-332e-46a6-a2dd-cdbfd9fdb371";
 
         public HttpClient Client { get; }
 
@@ -28,17 +28,32 @@ namespace User
 
         }
 
-        private void SetHeaders(HttpRequestMessage requestMessage, string token, string apiPlan)
+        private void SetHeaders(HttpRequestMessage requestMessage, string apiPlan)
         {
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             requestMessage.Headers.Add("Accept", "application/json");
             requestMessage.Headers.Add("X-DFS-API-PLAN", apiPlan);
         }
+
+        public async Task<TipGuide[]> GetTipGuides()
+        {
+            // Usings no longer need the squiggly brackets and will dispose when they go out of scope.
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _dciUri + _tipUrl + "guide");
+            SetHeaders(requestMessage, _tipApiPlan);
+
+            var response = await Client.SendAsync(requestMessage);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+
+            // System.Text.Json now exists with its own optimized json serializers.
+            return JsonSerializer.Deserialize<TipGuide[]>(json);
+        }
+
         public async Task<Currencies> GetCurrencyConversions()
         {
             // Usings no longer need the squiggly brackets and will dispose when they go out of scope.
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, _dciUri + _converterUrl + "exchangerates");
-            SetHeaders(requestMessage, _converterToken, _converterApiPlan);
+            SetHeaders(requestMessage, _converterApiPlan);
 
             var response = await Client.SendAsync(requestMessage);
             response.EnsureSuccessStatusCode();

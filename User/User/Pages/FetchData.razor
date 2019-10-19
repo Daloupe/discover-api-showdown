@@ -4,11 +4,11 @@
 @using User.Models
 @inject DCIClientService DCIClientService
 @inject ItemLineService ItemLineService
+
 User Id
 <input style="display: inline; width: 200px;" readonly value=@userId />
-
-User Id <input style="display: inline; width: 200px;" readonly value=@userId />
-Bill Id <input style="display: inline; width: 200px;" @bind=@billId />
+Bill Id
+<input style="display: inline; width: 200px;" @bind=@billId />
 <button @onclick="GetBill">Get Bill</button>
 
 @if (itemLines == null)
@@ -72,11 +72,13 @@ else
     string billId { get; set; }
     ItemLine[] itemLines;
     Currencies currencies;
+    TipGuide[] TipGuides;
 
     protected override async Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
         currencies = await DCIClientService.GetCurrencyConversions();
+        TipGuides = await DCIClientService.GetTipGuides();
         itemLines = await ItemLineService.GetItemLines(Guid.Empty);
     }
 
