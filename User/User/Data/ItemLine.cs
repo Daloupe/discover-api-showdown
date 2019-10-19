@@ -1,6 +1,6 @@
 using System;
 
-namespace Server
+namespace User
 {
     public class ItemLine
     {
