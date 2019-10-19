@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using User.Models;
+using Merchant.Models;
 
-namespace User
+namespace Merchant
 {
     public class DCIClientService
     {
@@ -18,7 +18,7 @@ namespace User
         private readonly string _tipApiPlan = "DCI_TIPETIQUETTE_SANDBOX";
         private readonly string _tipUrl = "tip/v1/";
 
-        private readonly string _token = "f84904c9-332e-46a6-a2dd-cdbfd9fdb371";
+        private readonly string _token = "07ebbc11-b96e-4ae5-bb33-a8fdd56678fe";
 
         public HttpClient Client { get; }
 

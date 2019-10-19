@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using User.Models;
+using System.Linq;
 
 namespace User
 {
@@ -47,7 +48,7 @@ namespace User
             var json = await response.Content.ReadAsStringAsync();
 
             // System.Text.Json now exists with its own optimized json serializers.
-            return JsonSerializer.Deserialize<TipGuide[]>(json);
+            return JsonSerializer.Deserialize<TipGuide[]>(json).Where(x => x.TipCategoryDesc == "Restaurant").ToArray();
         }
 
         public async Task<Currency[]> GetCurrencyConversions()

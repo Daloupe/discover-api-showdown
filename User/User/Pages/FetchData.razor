@@ -121,17 +121,17 @@ else
     decimal exchangeRate = 1;
     ItemLine[] itemLines;
     Currency[] currencies = Array.Empty<Currency>();
-    TipGuide[] TipGuides;
     decimal tipAmount = 0;
     TipGuide CurrentTipGuide;
+    TipGuide[] tipGuides;
 
     protected override async Task OnInitializedAsync()
     {
         userId = Guid.NewGuid();
         currencies = await DCIClientService.GetCurrencyConversions();
-        TipGuides = await DCIClientService.GetTipGuides();
+        tipGuides = await DCIClientService.GetTipGuides();
         itemLines = await ItemLineService.GetItemLines(Guid.Empty);
-        CurrentTipGuide = TipGuides.FirstOrDefault(x => x.CountryName == (itemLines.FirstOrDefault()?.MerchantCountry ?? "United States"));
+        CurrentTipGuide = tipGuides.FirstOrDefault(x => x.CountryName == (itemLines.FirstOrDefault()?.MerchantCountry ?? "United States"));
         if (decimal.TryParse(CurrentTipGuide.DefaultTipAmount, out var defaultTip))
         {
             tipAmount = defaultTip;
