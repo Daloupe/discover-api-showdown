@@ -16,5 +16,7 @@ namespace User
         public bool IsPaid { get; set; }
         public Guid? PayerId { get; set; }
         public decimal Tip { get; set; }
+        public string MerchantCountry { get; set; }
+        public string MerchantCurrency { get; set; }
     }
 }
