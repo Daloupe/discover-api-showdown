@@ -1,11 +1,13 @@
-﻿@page "/fetchdata"
+﻿@page "/createbill"
 
-@using User.Data
-@inject ItemLineService ItemLineService
+@using Merchant.Data
+@inject ItemService ItemService
 
-User Id <input style="display: inline; width: 200px;" readonly value=@userId />
+<h1>Create Bill</h1>
 
-@if (itemLines == null)
+Bill Id <input style="display: inline; width: 200px;" readonly value=@billId />
+
+@if (items == null)
 {
     <p><em>Loading Items</em></p>
 }
@@ -22,12 +24,12 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var itemLine in itemLines.Where(x => x.IsClaimed == ItemLine.NO))
+                    @foreach (var item in items)
                     {
                         <tr>
-                            <td>@itemLine.Name</td>
-                            <td class="item-price">@itemLine.Price</td>
-                            <td class="action-button" @onclick="@(() => ClaimItemLine(itemLine))">+</td>
+                            <td>@item.Name</td>
+                            <td class="item-price">@item.Price</td>
+                            <td class="action-button" @onclick="@(() => AddItem(item))">+</td>
                         </tr>
                     }
                 </tbody>
@@ -43,15 +45,12 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var itemLine in itemLines.Where(x => x.IsClaimed == ItemLine.YES))
+                    @foreach (var itemLine in itemLines)
                     {
                         <tr>
                             <td class="item-name">@itemLine.Name</td>
                             <td class="item-price">@itemLine.Price</td>
-                            @if (itemLine.ClaimerId == userId)
-                            {
-                                <td class="action-button" @onclick="@(() => UnclaimItemLine(itemLine))">-</td>
-                            }
+                            <td class="action-button" @onclick="@(() => RemoveItemLine(itemLine))">-</td>
                         </tr>
                     }
                 </tbody>
@@ -60,24 +59,27 @@ else
     </div>
 }
 
-@code
-{
-    Guid userId;
-    ItemLine[] itemLines;
+@code {
+    Item[] items;
+    List<ItemLine> itemLines;
+    Guid billId;
 
     protected override async Task OnInitializedAsync()
     {
-        userId = Guid.NewGuid();
-        itemLines = await ItemLineService.GetItemLines(Guid.Empty);
+        billId = Guid.NewGuid();
+        itemLines = new List<ItemLine>();
+        items = await ItemService.GetItems();
     }
 
-    protected async Task ClaimItemLine(ItemLine itemLine)
+    protected void AddItem(Item item)
     {
-        itemLines = await ItemLineService.ClaimItemLine(userId, itemLine.ItemId);
+        itemLines.Add(ItemLine.From(billId, item));
+        StateHasChanged();
     }
 
-    protected async Task UnclaimItemLine(ItemLine itemLine)
+    protected void RemoveItemLine(ItemLine itemLine)
     {
-        itemLines = await ItemLineService.UnclaimItemLine(itemLine.ItemId);
+        itemLines.Remove(itemLine);
+        StateHasChanged();
     }
 }

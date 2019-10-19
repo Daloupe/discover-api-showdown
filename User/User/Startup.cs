@@ -33,6 +33,9 @@ namespace User
                 c.BaseAddress = new Uri("https://api.discover.com/dci/");
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             });
+            services.AddSingleton<ItemLineService>();
+            services.AddHttpClient();
+            //services.AddOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
