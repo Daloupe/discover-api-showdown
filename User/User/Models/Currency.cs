@@ -22,7 +22,8 @@ namespace User.Models
         public Currency[] CurrencyArray { get; set; }
     }
 }
-
+//{
+//    "date": "2019-10-19 03:16:40",
 //"currencies": [
 // {
 // "curr_cd": "AFN",
